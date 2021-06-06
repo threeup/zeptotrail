@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using zeptolib;
 
 public class TextRenderer : LazySingletonBehaviour<TextRenderer>
 {
-    public Text text;
+    public TMP_Text text;
     public int radius = 4;
     private StringBuilder sb = new StringBuilder();
     public void Draw(World w, Human h, int x, int y)

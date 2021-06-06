@@ -36,7 +36,7 @@ namespace zeptolib
                     }
                     else
                     {
-                        line.Append('~');
+                        line.Append(Consts.ALMOST_EQUAL);
                     }
                 }
                 if(row >=2 && row <= 6)
