@@ -25,6 +25,11 @@ public class Boss : LazySingletonBehaviour<Boss>
         prop = new Prop();
         prop.position.Set(3, 3, 0);
         world.AddProp(prop);
+
+
+        SpriteRenderer.Instance.Setup();
+
+
     }
 
     // Update is called once per frame
