@@ -5,6 +5,7 @@ namespace zeptolib
 {
     public class Program
     {
+        public static CardManager cardManager;
         public static World world;
         public static Human human;
 
@@ -13,9 +14,12 @@ namespace zeptolib
             Console.WriteLine("Hello World!");
             Console.OutputEncoding = System.Text.Encoding.UTF8;
 
+            cardManager = new CardManager();
+            cardManager.Populate("actions.csv");
             world = new World();
             world.Generate(10, 10);
             human = new Human();
+            human.Setup();
             Hero hero = new Hero();
             human.Possess(hero);
             world.AddPawn(hero);
@@ -25,31 +29,40 @@ namespace zeptolib
             ConsoleKeyInfo val = default(ConsoleKeyInfo);
             int camX = 0;
             int camY = 0;
-            Action.Slot? inputKey = null;
+            int moveX = 0;
+            int moveY = 0;
+            Slot? slotKey = null;
             while (val.Key != ConsoleKey.Escape)
             {
                 Console.Clear();
                 ConsoleRenderer.Draw(world, human, camX, camY);
                 val = Console.ReadKey();
-                inputKey = null;
+                moveX = 0;
+                moveY = 0;
+                slotKey = null;
                 switch (val.Key)
                 {
-                    case ConsoleKey.UpArrow: camY += 1; break;
-                    case ConsoleKey.DownArrow: camY -= 1; break;
-                    case ConsoleKey.LeftArrow: camX -= 1; break;
-                    case ConsoleKey.RightArrow: camX += 1; break;
-                    case ConsoleKey.D1: inputKey = Action.Slot.One; break;
-                    case ConsoleKey.D2: inputKey = Action.Slot.Two; break;
-                    case ConsoleKey.D3: inputKey = Action.Slot.Three; break;
-                    case ConsoleKey.D4: inputKey = Action.Slot.Four; break;
-                    case ConsoleKey.D5: inputKey = Action.Slot.Five; break;
-                    case ConsoleKey.Enter: inputKey = Action.Slot.Cycle; break;
+                    case ConsoleKey.UpArrow: moveY = 1; break;
+                    case ConsoleKey.DownArrow: moveY = -1; break;
+                    case ConsoleKey.LeftArrow: moveX = -1; break;
+                    case ConsoleKey.RightArrow: moveX = 1; break;
+                    case ConsoleKey.D1: slotKey = Slot.One; break;
+                    case ConsoleKey.D2: slotKey = Slot.Two; break;
+                    case ConsoleKey.D3: slotKey = Slot.Three; break;
+                    case ConsoleKey.D4: slotKey = Slot.Four; break;
+                    case ConsoleKey.D5: slotKey = Slot.Five; break;
+                    case ConsoleKey.Enter: slotKey = Slot.Cycle; break;
                     default: break;
                 }
-                if (inputKey.HasValue)
+                if (slotKey.HasValue)
                 {
-                    human.DoAction(inputKey.Value);
+                    human.SelectSlot(slotKey.Value);
+                }
+                else if(moveX != 0 || moveY != 0)
+                {
+                    human.Move(moveX, moveY);
                     human.Tick();
+                    world.MovePawn(human.pawn);
                     camX = human.pawn.position.X;
                     camY = human.pawn.position.Y;
                 }

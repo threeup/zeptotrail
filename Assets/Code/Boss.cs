@@ -7,18 +7,24 @@ using zeptolib;
 public class Boss : LazySingletonBehaviour<Boss>
 {
     // Start is called before the first frame update
-
+    CardManager cardManager;
     World world;
     Human human;
     Hero hero;
     Prop prop;
+    int camX = 0;
+    int camY = 0;
+    
     void Start()
     {
         Debug.Log("Hello World!");
 
+        cardManager = new CardManager();
+        cardManager.Populate("Assets/zeptolib/actions.csv");
         world = new World();
         world.Generate(10, 10);
         human = new Human();
+        human.Setup();
         hero = new Hero();
         human.Possess(hero);
         world.AddPawn(hero);
@@ -35,40 +41,32 @@ public class Boss : LazySingletonBehaviour<Boss>
     // Update is called once per frame
     void Update()
     {
-        int camX = 0;
-        int camY = 0;
-        Action.Slot? inputKey = null;
         
         TextRenderer.Instance.Draw(world, human, camX, camY);
         
-        inputKey = null;
+        int moveX = 0;
+        int moveY = 0;
+        Slot? slotKey = null;
         Keyboard keyboard = Keyboard.current;
-        if(keyboard.upArrowKey.wasPressedThisFrame)
+        if (keyboard.upArrowKey.wasPressedThisFrame) { moveY = 1; }
+        if (keyboard.downArrowKey.wasPressedThisFrame) { moveY = -1; }
+        if (keyboard.leftArrowKey.wasPressedThisFrame) { moveX = -1; }
+        if (keyboard.rightArrowKey.wasPressedThisFrame) { moveX = 1; }
+        if (keyboard.digit1Key.wasPressedThisFrame) { slotKey = Slot.One; }
+        if (keyboard.digit2Key.wasPressedThisFrame) { slotKey = Slot.Two; }
+        if (keyboard.digit3Key.wasPressedThisFrame) { slotKey = Slot.Three; }
+        if (keyboard.digit4Key.wasPressedThisFrame) { slotKey = Slot.Four; }
+        if (keyboard.digit5Key.wasPressedThisFrame) { slotKey = Slot.Five; }
+        if (keyboard.enterKey.wasPressedThisFrame) { slotKey = Slot.Cycle; }
+        if (slotKey.HasValue)
         {
-            camY += 1;
+            human.SelectSlot(slotKey.Value);
         }
-        if(keyboard.downArrowKey.wasPressedThisFrame)
+        else if (moveX != 0 || moveY != 0)
         {
-            camY -= 1;
-        }
-        if(keyboard.leftArrowKey.wasPressedThisFrame)
-        {
-            camX -= 1;
-        }
-        if(keyboard.rightArrowKey.wasPressedThisFrame)
-        {
-            camX += 1;
-        }
-        if(keyboard.digit1Key.wasPressedThisFrame) { inputKey = Action.Slot.One; }
-        if(keyboard.digit2Key.wasPressedThisFrame) { inputKey = Action.Slot.Two; }
-        if(keyboard.digit3Key.wasPressedThisFrame) { inputKey = Action.Slot.Three; }
-        if(keyboard.digit4Key.wasPressedThisFrame) { inputKey = Action.Slot.Four; }
-        if(keyboard.digit5Key.wasPressedThisFrame) { inputKey = Action.Slot.Five; }
-        if(keyboard.spaceKey.wasPressedThisFrame) { inputKey = Action.Slot.Cycle; }
-        if (inputKey.HasValue)
-        {
-            human.DoAction(inputKey.Value);
+            human.Move(moveX, moveY);
             human.Tick();
+            world.MovePawn(human.pawn);
             camX = human.pawn.position.X;
             camY = human.pawn.position.Y;
         }

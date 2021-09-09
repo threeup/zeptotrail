@@ -47,10 +47,10 @@ public class TextRenderer : LazySingletonBehaviour<TextRenderer>
             if(row >=2 && row <= 6)
             {
                 int itx = row-2;
-                if(h.items.Count > itx)
+                if(h.cards.Count > itx)
                 {
                     sb.Append("  ["+(itx+1)+"] ");
-                    sb.Append(h.items[itx].Name);
+                    sb.Append(h.cards[itx].Name);
                 }
             }
             sb.AppendLine("");
